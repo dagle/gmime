@@ -67,20 +67,28 @@ libgmime_src = files(
   'internet-address.c',
 )
 
+private = [
+  'gmime-charset-map-private.h',
+  'gmime-table-private.h',
+  'gmime-parse-utils.h',
+  'gmime-gpgme-utils.h',
+  'gmime-internal.h',
+  'gmime-common.h',
+  'gmime-events.h',
+]
+
+
 libgmime_headers = [
   'gmime-application-pkcs7-mime.h',
   'gmime-autocrypt.h',
   'gmime-certificate.h',
   'gmime-charset.h',
-  'gmime-charset-map-private.h',
-  'gmime-common.h',
   'gmime-content-type.h',
   'gmime-crypto-context.h',
   'gmime-data-wrapper.h',
   'gmime-disposition.h',
   'gmime-encodings.h',
   'gmime-error.h',
-  'gmime-events.h',
   'gmime-filter-basic.h',
   'gmime-filter-best.h',
   'gmime-filter-charset.h',
@@ -99,12 +107,10 @@ libgmime_headers = [
   'gmime-filter-yenc.h',
   'gmime-format-options.h',
   'gmime-gpg-context.h',
-  'gmime-gpgme-utils.h',
   'gmime.h',
   'gmime-header.h',
   'gmime-iconv.h',
   'gmime-iconv-utils.h',
-  'gmime-internal.h',
   'gmime-message.h',
   'gmime-message-part.h',
   'gmime-message-partial.h',
@@ -115,7 +121,6 @@ libgmime_headers = [
   'gmime-param.h',
   'gmime-parser.h',
   'gmime-parser-options.h',
-  'gmime-parse-utils.h',
   'gmime-part.h',
   'gmime-part-iter.h',
   'gmime-pkcs7-context.h',
@@ -132,7 +137,6 @@ libgmime_headers = [
   'gmime-stream-mmap.h',
   'gmime-stream-null.h',
   'gmime-stream-pipe.h',
-  'gmime-table-private.h',
   'gmime-text-part.h',
   'gmime-utils.h',
   'gmime-version.h',
@@ -141,10 +145,6 @@ libgmime_headers = [
 
 inc_conf = include_directories('..')
 inc_util = include_directories('../util')
-
-# These should be used to generate stuff
-gen_table = executable('gen-table', 'gen-table.c')
-charset_map = executable('charset-map', 'charset-map.c', dependencies : deps, include_directories: inc_conf)
 
 version_data = configuration_data()
 version_data.set('GMIME_MAJOR_VERSION', GMIME_MAJOR_VERSION)
@@ -158,4 +158,54 @@ configure_file(input: 'gmime-version_meson.h.in',
   configuration : version_data
 )
 
-libgmime = library('gmime', libgmime_src, dependencies : deps + libutil_dep, include_directories: [inc_conf, inc_util])
+# These should be used to generate stuff
+gen_table = executable('gen-table', 'gen-table.c')
+charset_map = executable('charset-map', 'charset-map.c', dependencies : deps, 
+  include_directories: inc_conf)
+
+
+libgmime = library(libname, libgmime_src, dependencies : deps, 
+  include_directories: [inc_conf, inc_util], link_with: libutil, install: true)
+
+pkg = import('pkgconfig')
+
+
+pkg.generate(libgmime,
+  name: meson.project_name(),
+  filebase: libname,
+  subdirs: 'gmime-@0@.0'.format(GMIME_MAJOR_VERSION),
+  description: 'MIME parser and utility library',
+  requires: ['glib-2.0', 'gio-2.0', 'gobject-2.0']
+  # requires: ['glib-2.0 >= 2.68, zlib >= 1.2.5.2, gpgme >= 1.6.0, gobject-2.0, gio-2.0, gthread-2.0, libidn2 >= 2.0.0]
+  )
+
+install_headers(libgmime_headers, subdir: 'gmime-@0@.0'.format(GMIME_MAJOR_VERSION) / 'gmime')
+
+gnome = import('gnome')
+
+if get_option('introspection')
+  gir_args = [
+    '--accept-unprefixed',
+    ]
+
+  gmime_gir = gnome.generate_gir(
+    libgmime,
+    sources: libgmime_src + libgmime_headers,
+    namespace: 'GMime',
+    nsversion: '3.0',
+    symbol_prefix: ['g_mime', 'gmime'],
+    identifier_prefix : 'GMime',
+    includes: [ 'GObject-2.0', 'Gio-2.0'],
+    dependencies: deps,
+    extra_args: gir_args,
+    fatal_warnings: true,
+    install: true,
+  )
+endif
+
+# if get_option('vala')
+#   gnome.generate_vapi(libname,
+#     sources: gmime_gir[0],
+#     # packages: [ 'glib-2.0' ],
+#     install: true)
+# endif
