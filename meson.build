@@ -29,7 +29,7 @@ deps = [
   gpgme,
   dependency('gobject-2.0'),
   dependency('gio-2.0'),
-  dependency('gthread-2.0'),
+  # dependency('gthread-2.0'),
   libidn2,
   iconv,
 ]
@@ -39,6 +39,9 @@ cc = meson.get_compiler('c')
 conf_data = configuration_data()
 conf_data.set_quoted('GMIME_VERSION', meson.project_version())
 
+LIBS = ['glib-2.0', 'gio-2.0', 'gobject-2.0' ]
+EXTRA_LIBS = ['zlib']
+
 if cc.has_header('getopt.h')
   if cc.has_function('getopt_long')
     conf_data.set('HAVE_GETOPT_H', 1)
@@ -46,15 +49,19 @@ if cc.has_header('getopt.h')
 endif
 
 if gpgme.found()
-    conf_data.set('ENABLE_CRYPTO', 1)
+  conf_data.set('ENABLE_CRYPTO', 1)
+  EXTRA_LIBS += 'gpgme'
+  EXTRA_LIBS += 'gpg-error'
 endif
 
 if libidn2.found()
   conf_data.set('LIBIDN', 1)
+  EXTRA_LIBS += 'libidn2'
 endif
 
 if iconv.found()
   conf_data.set('HAVE_ICONV_DETECT_H', 1)
+  # EXTRA_LIBS += 'iconv'
 endif
 
 foreach hd : [

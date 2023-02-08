@@ -143,8 +143,7 @@ libgmime_headers = [
   'internet-address.h',
 ]
 
-inc_conf = include_directories('..')
-inc_util = include_directories('../util')
+inc_conf = include_directories('..', '../util')
 
 version_data = configuration_data()
 version_data.set('GMIME_MAJOR_VERSION', GMIME_MAJOR_VERSION)
@@ -165,7 +164,7 @@ charset_map = executable('charset-map', 'charset-map.c', dependencies : deps,
 
 
 libgmime = library(libname, libgmime_src, dependencies : deps, 
-  include_directories: [inc_conf, inc_util], link_with: libutil, install: true)
+  include_directories: inc_conf, link_with: libutil, install: true)
 
 pkg = import('pkgconfig')
 
@@ -175,13 +174,20 @@ pkg.generate(libgmime,
   filebase: libname,
   subdirs: 'gmime-@0@.0'.format(GMIME_MAJOR_VERSION),
   description: 'MIME parser and utility library',
-  requires: ['glib-2.0', 'gio-2.0', 'gobject-2.0']
-  # requires: ['glib-2.0 >= 2.68, zlib >= 1.2.5.2, gpgme >= 1.6.0, gobject-2.0, gio-2.0, gthread-2.0, libidn2 >= 2.0.0]
+  requires: LIBS,
+  # libraries_private: EXTRA_LIBS,
   )
 
 install_headers(libgmime_headers, subdir: 'gmime-@0@.0'.format(GMIME_MAJOR_VERSION) / 'gmime')
 
 gnome = import('gnome')
+
+src_doc = meson.project_source_root() / 'gmime'
+
+# if get_option('gtk-doc')
+  gnome.gtkdoc('gmime',
+    src_dir: src_doc)
+# endif
 
 if get_option('introspection')
   gir_args = [
@@ -203,9 +209,9 @@ if get_option('introspection')
   )
 endif
 
-# if get_option('vala')
-#   gnome.generate_vapi(libname,
-#     sources: gmime_gir[0],
-#     # packages: [ 'glib-2.0' ],
-#     install: true)
-# endif
+if get_option('vala')
+  gnome.generate_vapi(libname,
+    sources: gmime_gir[0],
+    packages: [ 'gio-2.0' ],
+    install: true)
+endif
