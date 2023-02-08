@@ -4,7 +4,6 @@ project('GMime',
     version: '3.2.13',
     meson_version: '>=1.0.0',
     default_options : [
-      # 'default_library=both'
     ])
 
 gmime_version = meson.project_version()
@@ -23,11 +22,13 @@ libname = 'gmime-@0@.0'.format(GMIME_MAJOR_VERSION)
 iconv = dependency('iconv', required : false, method: get_option('iconv'))
 libidn2 = dependency('libidn2', version: '>=2.0.0', required : false)
 gpgme = dependency('gpgme', version: '>=1.6.0', required: get_option('crypto'))
+glib =  dependency('glib-2.0', version: '>=2.68')
+gobject = dependency('gobject-2.0')
 deps = [
-  dependency('glib-2.0', version: '>=2.68'),
   dependency('zlib', version: '>=1.2.5.2'),
+  glib,
   gpgme,
-  dependency('gobject-2.0'),
+  gobject,
   dependency('gio-2.0'),
   # dependency('gthread-2.0'),
   libidn2,
@@ -116,4 +117,7 @@ configure_file(input: 'config_meson.h.in',
 
 subdir('util')
 subdir('gmime')
+# if get_option('gtk-doc')
+  subdir('docs')
+# endif
 subdir('tests')

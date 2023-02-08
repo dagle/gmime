@@ -77,7 +77,6 @@ private = [
   'gmime-events.h',
 ]
 
-
 libgmime_headers = [
   'gmime-application-pkcs7-mime.h',
   'gmime-autocrypt.h',
@@ -184,10 +183,6 @@ gnome = import('gnome')
 
 src_doc = meson.project_source_root() / 'gmime'
 
-# if get_option('gtk-doc')
-  gnome.gtkdoc('gmime',
-    src_dir: src_doc)
-# endif
 
 if get_option('introspection')
   gir_args = [
