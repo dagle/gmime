@@ -35,6 +35,9 @@ deps = [
   iconv,
 ]
 
+gmime_prefix = get_option('prefix')
+gmime_datadir = join_paths(gmime_prefix, get_option('datadir'))
+
 cc = meson.get_compiler('c')
 
 conf_data = configuration_data()
@@ -117,7 +120,7 @@ configure_file(input: 'config_meson.h.in',
 
 subdir('util')
 subdir('gmime')
-# if get_option('gtk-doc')
+# if get_option('gtk_doc')
   subdir('docs')
 # endif
 subdir('tests')
