@@ -153,7 +153,6 @@ configure_file(input: 'gmime-version_meson.h.in',
   configuration : version_data
 )
 
-# These should be used to generate stuff
 gen_table = executable('gen-table', 'gen-table.c')
 charset_map = executable('charset-map', 'charset-map.c', dependencies : deps, 
   include_directories: inc_conf)
@@ -165,8 +164,7 @@ table_h = custom_target('gen-table',
 charset_h = custom_target('charset-map',
   capture: true,
   output : ['gmime-charset-map-private.h'],
-  command : [gen_table])
-
+  command : [charset_map])
 
 libgmime = library(gmime_package, libgmime_src + table_h + charset_h, dependencies : deps, 
   include_directories: inc_conf, link_with: libutil, install: true)
