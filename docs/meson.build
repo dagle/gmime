@@ -1,6 +1,6 @@
 gidocgen_common_args = [
-  # '--quiet',
-  # '--no-namespace-dir',
+  '--quiet',
+  '--no-namespace-dir',
 ]
 
 # lets use the new gir to generate docs

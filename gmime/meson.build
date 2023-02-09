@@ -1,5 +1,3 @@
-  # 'charset-map.c',
-  # 'gen-table.c',
 libgmime_src = files(
   'gmime-application-pkcs7-mime.c',
   'gmime-autocrypt.c',
@@ -150,7 +148,6 @@ version_data.set('GMIME_MINOR_VERSION', GMIME_MINOR_VERSION)
 version_data.set('GMIME_MICRO_VERSION', GMIME_MICRO_VERSION)
 version_data.set('GMIME_BINARY_AGE', GMIME_BINARY_AGE)
 version_data.set('GMIME_INTERFACE_AGE', GMIME_INTERFACE_AGE)
-
 configure_file(input: 'gmime-version_meson.h.in',
   output: 'gmime-version.h',
   configuration : version_data
@@ -161,23 +158,31 @@ gen_table = executable('gen-table', 'gen-table.c')
 charset_map = executable('charset-map', 'charset-map.c', dependencies : deps, 
   include_directories: inc_conf)
 
+table_h = custom_target('gen-table',
+  capture: true,
+  output : ['gmime-table-private.h'],
+  command : [gen_table])
+charset_h = custom_target('charset-map',
+  capture: true,
+  output : ['gmime-charset-map-private.h'],
+  command : [gen_table])
 
-libgmime = library(libname, libgmime_src, dependencies : deps, 
+
+libgmime = library(gmime_package, libgmime_src + table_h + charset_h, dependencies : deps, 
   include_directories: inc_conf, link_with: libutil, install: true)
 
 pkg = import('pkgconfig')
 
-
 pkg.generate(libgmime,
   name: meson.project_name(),
-  filebase: libname,
-  subdirs: 'gmime-@0@.0'.format(GMIME_MAJOR_VERSION),
+  filebase: gmime_package,
+  subdirs: gmime_package,
   description: 'MIME parser and utility library',
   requires: LIBS,
   # libraries_private: EXTRA_LIBS,
   )
 
-install_headers(libgmime_headers, subdir: 'gmime-@0@.0'.format(GMIME_MAJOR_VERSION) / 'gmime')
+install_headers(libgmime_headers, subdir: gmime_package / 'gmime')
 
 gnome = import('gnome')
 
@@ -192,6 +197,8 @@ if get_option('introspection')
   gmime_gir = gnome.generate_gir(
     libgmime,
     sources: libgmime_src + libgmime_headers,
+    export_packages: [gmime_package],
+    header: 'gmime/gmime.h',
     namespace: 'GMime',
     nsversion: '3.0',
     symbol_prefix: ['g_mime', 'gmime'],
@@ -205,7 +212,7 @@ if get_option('introspection')
 endif
 
 if get_option('vala')
-  gnome.generate_vapi(libname,
+  gnome.generate_vapi(gmime_package,
     sources: gmime_gir[0],
     packages: [ 'gio-2.0' ],
     install: true)

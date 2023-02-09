@@ -15,9 +15,9 @@ GMIME_MICRO_VERSION=ver_arr[2].to_int()
 GMIME_BINARY_AGE= 100 * GMIME_MINOR_VERSION + GMIME_MICRO_VERSION
 GMIME_INTERFACE_AGE=0
 
-add_global_arguments('-DHAVE_CONFIG_H=1', language : 'c')
+gmime_package = 'gmime-@0@.0'.format(GMIME_MAJOR_VERSION)
 
-libname = 'gmime-@0@.0'.format(GMIME_MAJOR_VERSION)
+add_global_arguments('-DHAVE_CONFIG_H=1', language : 'c')
 
 iconv = dependency('iconv', required : false, method: get_option('iconv'))
 libidn2 = dependency('libidn2', version: '>=2.0.0', required : false)
@@ -30,7 +30,6 @@ deps = [
   gpgme,
   gobject,
   dependency('gio-2.0'),
-  # dependency('gthread-2.0'),
   libidn2,
   iconv,
 ]
@@ -121,6 +120,6 @@ configure_file(input: 'config_meson.h.in',
 subdir('util')
 subdir('gmime')
 # if get_option('gtk_doc')
-  subdir('docs')
+  subdir('docs/reference_gi')
 # endif
 subdir('tests')

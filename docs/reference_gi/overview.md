@@ -32,16 +32,17 @@ GMime depends on the following libraries:
    drives, volumes, stream IO, as well as network programming and IPC though
    DBus. More information available on the [GIO website][gio].
 
-GMime can be devided into these groups classes: 
+GMime can be divided into these groups classes: 
 
- - Parsers: Parses messages and mime parts
- - Streams: Reads data for different sources
- - Filters: Apply functions to data.
- - DataWrapppers: Use a source of data like a stream
- - Internet Addresses: An email address or groups of addresses.
- - Headers: Different header in a message or mime.
- - MimeParts: Different kinds of Mimes a message or mime can contain
- - Cryptography: Cryptographic functions.
+ - **Parsers**: Parses messages and mime parts
+ - **Streams**: Reads data from different sources
+ - **Filters**: Apply functions to data streams.
+ - **DataWrapppers**: Use a source (like a mimepart) of data like a stream
+ - **Internet Addresses**: An email address or groups of addresses
+ - **Headers**: headers in a message or mime.
+ - **MimeParts**: Different kinds of Mimes a message or mime can contain, making up
+   a tree structure
+ - **Cryptography**: Cryptographic functions and encrypted mimes.
 
 [gnu-lgpl]: https://www.gnu.org/licenses/old-licenses/lgpl-2.1.en.html
 [glib]: https://developer.gnome.org/glib/stable/

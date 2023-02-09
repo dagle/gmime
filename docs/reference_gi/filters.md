@@ -1,0 +1,40 @@
+Title: Filters
+
+# How to use Stream Filters
+Stream filters are an efficient way of converting data from
+one format to another. To use a stream filter, you must first
+construct a GMimeStreamFilter stream and then add the desired
+filters to it.
+
+GMime comes equipped with some basic filters such as
+GMimeFilterBasic, GMimeFilterCharset, GMimeFilterDos2Unix,
+GMimeFilterUnix2Dos, GMimeFilterFrom and GMimeFilterHTML.
+
+The GMimeFilterBasic filter is actually a collection of
+filters for common transfer encodings used by MIME. So far, it is
+able to handle encoding and decoding of base64, quoted-printable
+and (x-)uuencode.
+
+For internationalization support, GMime also includes a
+filter for converting between any 2 charsets,
+GMimeFilterCharset. With this filter, mail user agents can allow
+the user to read the message content in his or her own
+charset.
+
+A common conversion needed for text is CRLF -> LF and LF ->
+CRLF which is needed for most (all?) internet protocols. Luckily,
+GMime comes equipped with a set of filters to handle this for you:
+GMimeFilterDos2Unix and GMimeFilterUnix2Dos.
+
+On Unix systems, mail often resides in spools in mbox
+format. Mbox uses a line that starts with "From " to delimit
+messages which means that message bodies are forbidden to contain
+lines starting with "From ". The common way to escape these from
+lines in message bodies is to prepend the line with a greater-than
+character ('\>') producing "\>From ". You'll find GMimeFilterFrom
+handy when dealing with this.
+
+The GMimeFilterHTML filter converts a normal text stream
+into an html stream. This is especially useful if you are using a
+widget such as GtkHTML to display the contents of an email
+message.
