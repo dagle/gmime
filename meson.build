@@ -123,3 +123,15 @@ subdir('gmime')
   subdir('docs/reference_gi')
 # endif
 subdir('tests')
+
+summary({'Install Prefix': get_option('prefix'),
+        'Compiler': cc.get_id(),
+        'Documentation': get_option('gtk_doc'),
+        'Profiling enabled': false, #TODO
+        'Coverage enabled': false, #TODO
+        'PGP/MIME support': get_option('crypto'),
+        'S/MIME support': get_option('crypto'),
+        'libidn2 support': libidn2.found(),
+        'GObject introspection': get_option('introspection'),
+        'Vala bindings': get_option('vala'),
+        }, section: 'Configuration')
